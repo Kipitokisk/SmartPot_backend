@@ -1,6 +1,7 @@
 package com.example.SmartPot.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
@@ -23,8 +24,10 @@ public class User {
     @Email
     @Column(unique = true)
     private String email;
+    @JsonIgnore
     private String password;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Pot> pots;
     @Enumerated(EnumType.STRING)
     private Role role;

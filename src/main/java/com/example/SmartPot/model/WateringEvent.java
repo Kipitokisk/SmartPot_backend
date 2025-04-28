@@ -24,5 +24,6 @@ public class WateringEvent {
     private Pot pot;
     private LocalDateTime timestamp;
     private Integer durationSeconds;
-    private String method;
+    @Enumerated(EnumType.STRING)
+    private WateringMethod method;
 }

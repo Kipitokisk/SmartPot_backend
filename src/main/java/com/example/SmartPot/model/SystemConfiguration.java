@@ -1,6 +1,5 @@
 package com.example.SmartPot.model;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,22 +7,23 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "pots")
+@Table(name = "system_configurations")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Pot {
+public class SystemConfiguration {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne
+
+    private Integer maxWateringTimeSeconds;
+
+    private Integer minCoolingPeriodMinutes;
+
+    private Integer wateringCycleMinutes;
+
+    @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
-    @ManyToOne
-    @JoinColumn(name = "plant_id")
-    private Plant plant;
-    private Integer currentMoisture;
-    private Integer waterReservoir;
-
 }
