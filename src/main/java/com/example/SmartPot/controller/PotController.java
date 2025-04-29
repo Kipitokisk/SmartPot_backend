@@ -2,6 +2,7 @@ package com.example.SmartPot.controller;
 
 import com.example.SmartPot.dto.PotCreationDTO;
 import com.example.SmartPot.dto.PotResponseDTO;
+import com.example.SmartPot.exceptions.ResourceAlreadyExistsException;
 import com.example.SmartPot.exceptions.ResourceNotFoundException;
 import com.example.SmartPot.model.Plant;
 import com.example.SmartPot.model.Pot;
@@ -53,8 +54,8 @@ public class PotController {
         try {
             Pot pot = potService.createPot(requestDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(pot);
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (ResourceAlreadyExistsException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred: " + e.getMessage());
         }
@@ -77,6 +78,6 @@ public class PotController {
     @GetMapping("user/{id}")
     public ResponseEntity<?> getAllPotsByUserId(@PathVariable Long id) {
         List<PotResponseDTO> pots = potService.getAllPotsByUser(id);
-        return ResponseEntity.ok(pots);
+        return ResponseEntity.status(HttpStatus.OK).body(pots);
     }
 }

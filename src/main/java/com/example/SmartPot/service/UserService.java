@@ -1,7 +1,8 @@
 package com.example.SmartPot.service;
 
 import com.example.SmartPot.dto.AuthDTO;
-import com.example.SmartPot.exceptions.UserAlreadyExistsException;
+import com.example.SmartPot.exceptions.ResourceNotFoundException;
+import com.example.SmartPot.exceptions.ResourceAlreadyExistsException;
 import com.example.SmartPot.exceptions.UserRegistrationException;
 import com.example.SmartPot.model.Role;
 import com.example.SmartPot.model.User;
@@ -24,19 +25,24 @@ public class UserService {
 
     public User saveUser(AuthDTO user) {
         if (userRepository.findUserByEmail(user.getEmail()).isPresent()) {
-            throw new UserAlreadyExistsException("User with " + user.getEmail() + " already exists!");
+            throw new ResourceAlreadyExistsException("User with " + user.getEmail() + " already exists!");
         }
 
         try {
             String encodedPassword = passwordEncoder.encode(user.getPassword());
-            User newUser = new User();
-            newUser.setEmail(user.getEmail());
-            newUser.setPassword(encodedPassword);
-            newUser.setRole(Role.USER);
-            newUser.setPots(new ArrayList<>());
+            User newUser = User.builder()
+                    .email(user.getEmail())
+                    .password(encodedPassword)
+                    .role(Role.USER)
+                    .pots(new ArrayList<>())
+                    .build();
             return userRepository.save(newUser);
         } catch (DataAccessException e) {
             throw new UserRegistrationException("Could not save user with email: " + user.getEmail(), e);
         }
+    }
+
+    public User getUserById(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found."));
     }
 }

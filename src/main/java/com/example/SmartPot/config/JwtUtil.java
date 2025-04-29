@@ -87,17 +87,4 @@ public class JwtUtil {
             return false;
         }
     }
-
-    // Validate token without user details (just checks if token is valid and not expired)
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parser()
-                    .verifyWith(Keys.hmacShaKeyFor(secretKeyString.getBytes(StandardCharsets.UTF_8)))
-                    .build()
-                    .parseSignedClaims(token);
-            return !isTokenExpired(token);
-        } catch (JwtException e) {
-            return false;
-        }
-    }
 }

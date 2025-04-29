@@ -2,7 +2,7 @@ package com.example.SmartPot.controller;
 
 import com.example.SmartPot.dto.AuthDTO;
 import com.example.SmartPot.dto.LoginResponseDTO;
-import com.example.SmartPot.exceptions.UserAlreadyExistsException;
+import com.example.SmartPot.exceptions.ResourceAlreadyExistsException;
 import com.example.SmartPot.exceptions.UserRegistrationException;
 import com.example.SmartPot.model.User;
 import com.example.SmartPot.repository.UserRepository;
@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,7 +44,7 @@ public class AuthController {
         try {
             User savedUser = userService.saveUser(user);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
-        } catch (UserAlreadyExistsException e) {
+        } catch (ResourceAlreadyExistsException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         } catch (UserRegistrationException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -66,7 +65,7 @@ public class AuthController {
                 User user = userOptional.get();
                 String token = jwtUtil.generateToken(user.getId().toString(), user.getEmail(), user.getRole().name());
 
-                return ResponseEntity.ok(new LoginResponseDTO(token, user.getEmail(), user.getRole().name()));
+                return ResponseEntity.status(HttpStatus.OK).body(new LoginResponseDTO(token, user.getEmail(), user.getRole().name()));
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
             }
