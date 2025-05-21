@@ -9,7 +9,6 @@ import com.example.SmartPot.model.User;
 import com.example.SmartPot.repository.PlantRepository;
 import com.example.SmartPot.repository.PotRepository;
 import com.example.SmartPot.repository.UserRepository;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

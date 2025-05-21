@@ -1,11 +1,9 @@
 package com.example.SmartPot.service;
 
 import com.example.SmartPot.exceptions.PlantCreationException;
-import com.example.SmartPot.exceptions.ResourceAlreadyExistsException;
 import com.example.SmartPot.exceptions.ResourceNotFoundException;
 import com.example.SmartPot.model.Plant;
 import com.example.SmartPot.repository.PlantRepository;
-import com.example.SmartPot.repository.PotRepository;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +11,7 @@ import org.springframework.stereotype.Service;
 public class PlantService {
     private final PlantRepository plantRepository;
 
-    public PlantService(PotRepository potRepository, PlantRepository plantRepository) {
+    public PlantService(PlantRepository plantRepository) {
         this.plantRepository = plantRepository;
     }
 
