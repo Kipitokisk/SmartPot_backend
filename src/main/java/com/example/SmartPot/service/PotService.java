@@ -36,6 +36,17 @@ public class PotService {
                 .toList();
     }
 
+    public List<PotResponseDTO> getAllPots() {
+        return potRepository.findAll().stream().map(pot -> PotResponseDTO.builder()
+                        .id(pot.getId())
+                        .userId(pot.getUser().getId())
+                        .plantId(pot.getPlant().getId())
+                        .currentMoisture(pot.getCurrentMoisture())
+                        .waterReservoir(pot.getWaterReservoir())
+                        .build())
+                .toList();
+    }
+
     public Pot createPot(PotCreationDTO requestDTO) {
         User user = userRepository.findById(requestDTO.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found."));

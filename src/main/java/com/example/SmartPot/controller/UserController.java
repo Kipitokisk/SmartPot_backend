@@ -10,7 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
@@ -30,11 +32,20 @@ public class UserController {
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
         try {
             User user = userService.getUserById(id);
-            return ResponseEntity.status(HttpStatus.FOUND).body(user);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", "true");
+            response.put("message", "User retrieved");
+            response.put("data", user);
+
+
+            return ResponseEntity.status(HttpStatus.FOUND).body(response);
         } catch (ResourceAlreadyExistsException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+            Map<String, Object> response = getErrorResponse(e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred: " + e.getMessage());
+            Map<String, Object> response = getErrorResponse("An unexpected error occurred: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 
         }
     }
@@ -50,5 +61,25 @@ public class UserController {
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id) {
         userRepository.deleteById(id);
+    }
+
+    private static Map<String, Object> getErrorResponse(String message) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", "false");
+        response.put("message", message);
+        response.put("data", null);
+        return response;
+    }
+
+    public String extractMessage(String errorMessage) {
+        try {
+            if (errorMessage.contains("interpolatedMessage='")) {
+                String readableMessage = errorMessage.split("interpolatedMessage='")[1].split("'")[0];
+                return readableMessage;
+            }
+            return errorMessage;
+        } catch (Exception e) {
+            return "Error parsing response: " + errorMessage;
+        }
     }
 }

@@ -12,7 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/pots")
@@ -35,6 +37,12 @@ public class PotController {
         } else {
             pots = potService.getAllPotsByUser(userId);
         }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", "true");
+        response.put("message", "Pots retrieved successfully");
+        response.put("data", pots);
+
         return ResponseEntity.status(HttpStatus.OK).body(pots);
     }
 
@@ -45,11 +53,19 @@ public class PotController {
             Long userId = Long.valueOf(jwtUtil.extractUserId(token));
             String role = jwtUtil.extractRole(token);
             Pot pot = potService.getPotById(id, userId, role);
-            return ResponseEntity.status(HttpStatus.FOUND).body(pot);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", "true");
+            response.put("message", "Pots retrieved successfully");
+            response.put("data", pot);
+
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            Map<String, Object> response = getErrorResponse(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred: " + e.getMessage());
+            Map<String, Object> response = getErrorResponse("An unexpected error occurred: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
@@ -58,13 +74,21 @@ public class PotController {
         try {
             String token = extractTokenFromHeader();
             Long userId = Long.valueOf(jwtUtil.extractUserId(token));
-            requestDTO.setUserId(userId); // Ensure the pot is created for the authenticated user
+            requestDTO.setUserId(userId);
             Pot pot = potService.createPot(requestDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body(pot);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", "true");
+            response.put("message", "Pot created successfully");
+            response.put("data", pot);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            Map<String, Object> response = getErrorResponse(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred: " + e.getMessage());
+            Map<String, Object> response = getErrorResponse("An unexpected error occurred: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
@@ -75,11 +99,19 @@ public class PotController {
             Long userId = Long.valueOf(jwtUtil.extractUserId(token));
             String role = jwtUtil.extractRole(token);
             Pot updatedPot = potService.updatePot(id, pot, userId, role);
-            return ResponseEntity.ok(updatedPot);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", "true");
+            response.put("message", "Pot updated successfully");
+            response.put("data", updatedPot);
+
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            Map<String, Object> response = getErrorResponse(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred: " + e.getMessage());
+            Map<String, Object> response = getErrorResponse("An unexpected error occurred: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
@@ -90,11 +122,19 @@ public class PotController {
             Long userId = Long.valueOf(jwtUtil.extractUserId(token));
             String role = jwtUtil.extractRole(token);
             potService.deletePot(id, userId, role);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", "true");
+            response.put("message", "Pot deleted successfully");
+            response.put("data", null);
+
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
         } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            Map<String, Object> response = getErrorResponse(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred: " + e.getMessage());
+            Map<String, Object> response = getErrorResponse("An unexpected error occurred: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
@@ -104,10 +144,17 @@ public class PotController {
         Long authenticatedUserId = Long.valueOf(jwtUtil.extractUserId(token));
         String role = jwtUtil.extractRole(token);
         if (!role.equals("ROLE_ADMIN") && !authenticatedUserId.equals(id)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You can only access your own pots.");
+            Map<String, Object> response = getErrorResponse("You can only access your own pots");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
         }
         List<PotResponseDTO> pots = potService.getAllPotsByUser(id);
-        return ResponseEntity.status(HttpStatus.OK).body(pots);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", "true");
+        response.put("message", "Pots retrieved successfully");
+        response.put("data", pots);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     private String extractTokenFromHeader() {
@@ -116,5 +163,13 @@ public class PotController {
             return authHeader.substring(7);
         }
         throw new RuntimeException("JWT Token not found in request headers");
+    }
+
+    private static Map<String, Object> getErrorResponse(String message) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", "false");
+        response.put("message", message);
+        response.put("data", null);
+        return response;
     }
 }
