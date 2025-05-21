@@ -16,8 +16,9 @@ public class SmartPotApplication {
 
 	@Bean
 	FirebaseMessaging firebaseMessaging() throws IOException {
+		String firebaseConfigPath = System.getenv("FIREBASE_CONFIG_PATH");
 		GoogleCredentials googleCredentials = GoogleCredentials.fromStream(
-				new ClassPathResource("firebase-service-account.json").getInputStream()
+				new ClassPathResource(firebaseConfigPath).getInputStream()
 		);
 		FirebaseOptions firebaseOptions = FirebaseOptions.builder()
 				.setCredentials(googleCredentials).build();
