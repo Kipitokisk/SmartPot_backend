@@ -31,4 +31,5 @@ public class User {
     private List<Pot> pots;
     @Enumerated(EnumType.STRING)
     private Role role;
+    private String deviceToken;
 }

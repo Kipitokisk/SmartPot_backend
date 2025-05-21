@@ -34,6 +34,7 @@ public class UserService {
                     .email(user.getEmail())
                     .password(encodedPassword)
                     .role(Role.USER)
+                    .deviceToken(user.getDeviceToken())
                     .pots(new ArrayList<>())
                     .build();
             return userRepository.save(newUser);
